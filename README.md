@@ -9,12 +9,28 @@ https://github.com/y-hatano-github/aclock/releases/latest
 
 
 ## 🚀 Quick start
+### 🐧 Linux
 ```bash
 wget https://github.com/y-hatano-github/aclock/releases/latest/download/aclock_linux_amd64.tar.gz
 tar -xzvf aclock_linux_amd64.tar.gz
 mv aclock /usr/local/bin/
 aclock
 ```
+### 🍎 macOS
+```bash
+curl -LO https://github.com/y-hatano-github/aclock/releases/latest/download/aclock_darwin_amd64.tar.gz
+tar -xzvf aclock_darwin_amd64.tar.gz
+sudo mv aclock /usr/local/bin/
+aclock
+```
+### 🪟 Windows
+```powershell
+Invoke-WebRequest -OutFile aclock_windows_amd64.zip https://github.com/y-hatano-github/aclock/releases/latest/download/aclock_windows_amd64.zip
+Expand-Archive aclock_windows_amd64.zip
+.\aclock.exe
+```
+
+
 ## ⚙️ Features
 
 - ⏰ Colorful analog clock rendered directly in your terminal
