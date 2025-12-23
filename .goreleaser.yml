@@ -8,7 +8,7 @@ before:
     - go mod tidy
 builds:
   - main: main.go
-    binary: candle
+    binary: aclock
     ldflags:
       - -s -w
       - -X main.Version={{.Version}}
