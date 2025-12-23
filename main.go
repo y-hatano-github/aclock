@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"math"
+	"strings"
 	"time"
 
 	"github.com/alecthomas/kong"
@@ -14,13 +15,15 @@ import (
 const centerX, centerY, axisX, axisY = 20, 10, 20, 10
 
 type model struct {
-	coords
+	Coords
 	Args
+	SystemBgColor string
 }
 
 type tickMsg time.Time
 
 var colors = map[string]string{
+	"system":  "x",
 	"black":   "0",
 	"red":     "1",
 	"green":   "2",
@@ -36,15 +39,19 @@ var colors = map[string]string{
 	"orange":  "214",
 }
 
-func tColor(name string) string {
+func (m model) tColor(name string) string {
 	if c, ok := colors[name]; ok {
+		if c == "x" {
+			return m.SystemBgColor // system background color
+		}
 		return c
 	}
-	return "0" // default black
+
+	return m.SystemBgColor // default system background color
 }
 
 type Args struct {
-	Background string `help:"Background color of the terminal area surrounding the clock." default:"black"`
+	Background string `help:"Background color of the terminal area surrounding the clock." default:"system"`
 	Face       string `help:"Color of the clock face. This is the filled area inside the frame." default:"gray"`
 	Frame      string `help:"Color of the outer frame of the clock." default:"white"`
 	Hour       string `help:"Color of the hour hand." default:"blue"`
@@ -54,7 +61,7 @@ type Args struct {
 	Tick       string `help:"Color of the tick marks." default:"red"`
 }
 
-type coords struct {
+type Coords struct {
 	Fc c.Points // face
 	Hm c.Points // HourMark
 	Hh c.Points // hours hand
@@ -68,7 +75,7 @@ func main() {
 	var args Args
 
 	kong.Parse(&args,
-		kong.Name("clock"),
+		kong.Name("aclock"),
 		kong.Description(`
 A colorful analog clock rendered in your terminal.
 
@@ -83,16 +90,17 @@ You can customize the clock's appearance by specifying colors for:
 Colors available:
   black, red, green, yellow, blue, magenta, cyan, white
   gray, purple, brown, pink, orange
+  system (uses terminal's background color)
 
 Example:
-  clock --face blue --frame white --hour yellow --min green --sec red
+  aclock --face blue --frame white --hour yellow --min green --sec red
    
 Controls:
   ESC, Ctrl+C    Exit the application
   `),
 	)
-
-	p := tea.NewProgram(&model{Args: args})
+	sysbgc := termenv.BackgroundColor()
+	p := tea.NewProgram(&model{Args: args, SystemBgColor: sysbgc.Sequence(true)})
 	if _, err := p.Run(); err != nil {
 		log.Fatal(err)
 	}
@@ -144,46 +152,54 @@ func (m *model) View() string {
 		}
 	}
 
-	d(m.Fc, tColor(m.Args.Face), &v)
-	d(m.Hm, tColor(m.Args.Tick), &v)
-	d(m.Hh, tColor(m.Args.Hour), &v)
-	d(m.Mh, tColor(m.Args.Min), &v)
-	d(m.Sh, tColor(m.Args.Sec), &v)
-	d(m.Fr, tColor(m.Args.Frame), &v)
-	d(m.Pp, tColor(m.Args.Piv), &v)
+	d(m.Fc, m.tColor(m.Args.Face), &v)
+	d(m.Hm, m.tColor(m.Args.Tick), &v)
+	d(m.Hh, m.tColor(m.Args.Hour), &v)
+	d(m.Mh, m.tColor(m.Args.Min), &v)
+	d(m.Sh, m.tColor(m.Args.Sec), &v)
+	d(m.Fr, m.tColor(m.Args.Frame), &v)
+	d(m.Pp, m.tColor(m.Args.Piv), &v)
 
-	s := ""
 	p := termenv.ColorProfile()
+	var b strings.Builder
+	b.Grow(width * height * 10)
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
 			if v[x][y] == " " {
-				s = s + termenv.String(" ").Background(p.Color(tColor(m.Args.Background))).String()
+				b.WriteString(
+					termenv.String(" ").Background(p.Color(m.tColor(m.Args.Background))).String(),
+				)
+
 			} else {
-				s = s + termenv.String(" ").Background(p.Color(v[x][y])).String()
+				b.WriteString(
+					termenv.String(" ").Background(p.Color(v[x][y])).String(),
+				)
+
 			}
 		}
-		s += "\n"
+		b.WriteByte('\n')
+
 	}
 
-	return s
+	return b.String()
 }
 
 // calculate shape coordinates
 func (m *model) shapeCoords() {
 	t := time.Now()
-	h := func(time, cx, cy, h, v, dg int) c.Points {
-		d := float64(dg*time - 90)
-		x := float64(h) * math.Cos(float64(d)*3.14/180)
-		y := float64(v) * math.Sin(float64(d)*3.14/180)
+	hand := func(unit, cx, cy, rx, ry, deg int) c.Points {
+		d := float64(deg*unit - 90)
+		x := float64(rx) * math.Cos(float64(d)*3.14/180)
+		y := float64(ry) * math.Sin(float64(d)*3.14/180)
 
 		return c.Line(c.Point{X: cx, Y: cy}, c.Point{X: cx + int(x), Y: cy + int(y)})
 	}
 
-	m.Hm = c.Circled(centerX, centerY, axisX-2, axisY-1, 30)                            // HourMark
-	m.Hh = h(t.Hour()*5+int(t.Minute()/12), centerX, centerY, axisX-6, axisY-3, 360/60) // hours hand
-	m.Mh = h(t.Minute(), centerX, centerY, axisX, axisY, 360/60)                        // minutes hand
-	m.Sh = h(t.Second(), centerX, centerY, axisX, axisY, 360/60)                        // seconds hand
-	m.Fr, m.Fc = c.Circle(centerX, centerY, axisX, axisY)                               // frame
-	m.Pp = c.Points{c.Point{X: centerX, Y: centerY}}                                    // pivot point
+	m.Hm = c.Circled(centerX, centerY, axisX-2, axisY-1, 30)                               // HourMark
+	m.Hh = hand(t.Hour()*5+int(t.Minute()/12), centerX, centerY, axisX-6, axisY-3, 360/60) // hours hand
+	m.Mh = hand(t.Minute(), centerX, centerY, axisX, axisY, 360/60)                        // minutes hand
+	m.Sh = hand(t.Second(), centerX, centerY, axisX, axisY, 360/60)                        // seconds hand
+	m.Fr, m.Fc = c.Circle(centerX, centerY, axisX, axisY)                                  // frame
+	m.Pp = c.Points{c.Point{X: centerX, Y: centerY}}                                       // pivot point
 
 }
