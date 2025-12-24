@@ -1,12 +1,18 @@
 # 🕒 aclock
 A colorful analog clock for the terminal, built with Golang.
 
+## ⚙️ Features
+
+- ⏰ Colorful analog clock rendered directly in your terminal
+- 🎨 Customizable color scheme for all clock elements
+- 🧩 No dependencies — just a single binary
+- 🖥️ Cross-platform binaries (Windows, macOS, Linux)
+
 ## 💾 Download 
 Pre-built binaries are available for Windows, macOS, and Linux.
 
 👉 Get the latest release here:  
 https://github.com/y-hatano-github/aclock/releases/latest
-
 
 ## 🚀 Quick start
 ### 🐧 Linux
@@ -29,14 +35,6 @@ Invoke-WebRequest -OutFile aclock_windows_amd64.zip https://github.com/y-hatano-
 Expand-Archive aclock_windows_amd64.zip
 .\aclock.exe
 ```
-
-
-## ⚙️ Features
-
-- ⏰ Colorful analog clock rendered directly in your terminal
-- 🎨 Customizable color scheme for all clock elements
-- 🧩 No dependencies — just a single binary
-- 🖥️ Cross-platform binaries (Windows, macOS, Linux)
 
 ## 📘 Usage
 ```text
