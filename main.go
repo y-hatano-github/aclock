@@ -34,7 +34,11 @@ var colors = map[string]string{
 	"white":   "7",
 	"gray":    "8",
 	"purple":  "13",
+	"indigo":  "54",
+	"sky":     "117",
 	"brown":   "130",
+	"lime":    "154",
+	"scarlet": "197",
 	"pink":    "205",
 	"orange":  "214",
 }
@@ -88,8 +92,8 @@ You can customize the clock's appearance by specifying colors for:
  tick marks
 
 Colors available:
-  black, red, green, yellow, blue, magenta, cyan, white
-  gray, purple, brown, pink, orange
+  red, orange, yellow, lime, green, cyan, sky, blue, indigo,
+  purple, magenta, pink, scarlet, brown, gray, black, white,
   system (uses terminal's background color)
 
 Example:

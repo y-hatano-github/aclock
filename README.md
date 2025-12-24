@@ -42,6 +42,8 @@ Expand-Archive aclock_windows_amd64.zip
 ```text
 Usage: aclock [flags]
 
+A colorful analog clock rendered in your terminal.
+
 You can customize the clock's appearance by specifying colors for:
 
     background
@@ -53,8 +55,8 @@ You can customize the clock's appearance by specifying colors for:
 
 Colors available:
 
-    black, red, green, yellow, blue, magenta, cyan, white
-    gray, purple, brown, pink, orange
+    red, orange, yellow, lime, green, cyan, sky, blue, indigo,
+    purple, magenta, pink, scarlet, brown, gray, black, white,
     system (uses terminal's background color)
 
 Example:
