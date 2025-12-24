@@ -1,5 +1,7 @@
 # 🕒 aclock
-A colorful analog clock for the terminal, built with Golang.
+A colorful analog clock for the terminal, built with Golang.  
+
+![aclock](aclock.gif)
 
 ## ⚙️ Features
 
