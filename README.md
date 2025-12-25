@@ -1,7 +1,7 @@
-# 🕒 aclock
-A colorful analog clock for the terminal, built with Golang.  
 
 ![aclock](aclock.gif)
+# 🕒 aclock
+A colorful analog clock for the terminal, built with Golang.  
 
 ## ⚙️ Features
 
@@ -33,8 +33,8 @@ aclock
 ```
 ### 🪟 Windows
 ```powershell
-Invoke-WebRequest -OutFile aclock_windows_amd64.zip https://github.com/y-hatano-github/aclock/releases/latest/download/aclock_windows_amd64.zip
-Expand-Archive aclock_windows_amd64.zip
+Invoke-WebRequest -OutFile aclock_windows_amd64.tar.gz https://github.com/y-hatano-github/aclock/releases/latest/download/aclock_windows_amd64.tar.gz
+tar -xzvf aclock_windows_amd64.tar.gz
 .\aclock.exe
 ```
 
